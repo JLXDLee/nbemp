@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html ng-app="myApp">
+
+	<head>
+		<title>处方订单</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no">
+		<meta http-equiv="pragma" content="no-cache">
+		<meta http-equiv="cache-control" content="no-cache">
+		<meta http-equiv="expires" content="0">
+		<link rel="stylesheet" href="../css/ui-box.css">
+		<link rel="stylesheet" href="../css/ui-base.css">
+		<link rel="stylesheet" href="../css/ui-color.css">
+		<link rel="stylesheet" href="../css/win.css">
+		<link rel="stylesheet" href="../css/ui-img.css" />
+		<link rel="stylesheet" href="../css/tabs.css" />
+		<style>
+			#loading, .spinnerBg{/*top: 99px;*/top: 61px;}
+			.tab_title, .po_type{width: 100%;position: fixed;left: 0px;z-index: 99;}
+			.tab_title{top: 0px;}
+			#pList, #nop{margin-top: 70px;}
+			#pList{margin-bottom: 30px;}
+			.po_type{
+				/*top: 38px;*/
+				top: 0px;
+				padding-top: 10px;
+				line-height: 30px;
+			}
+			.po_status.active{
+				color: #f67301;
+			}
+			.po_img{
+				width: 100%;
+				height: 20px;
+				margin-right: 5px;
+			}
+			.pItem{
+				position: relative;
+				
+			}
+			.pi_status{
+				position: absolute;
+				top: 0px;
+				right: 10px;
+				color: #f67301;
+			}
+			.pi_pn{
+				padding: 0px 10px;
+			}
+			.lump {
+				border-bottom: 1px solid #E0E0E0;
+				background-color: #FFFFFF;
+				padding: 0px 10px;
+			}
+			.tab_title{border: none;}
+			.tab_title>li{border-bottom: 2px solid #e5e5e5;}
+			.tab_title>li.tabs_current_tab{margin-bottom: 0px;}
+			#drugOrder{margin-left: 10px;}
+			#prescriptionOrder{margin-right: 10px;}
+			.drugListItem {
+				padding: 8px 0px;
+				font-size: 12px;
+				line-height: 12px;
+				margin-bottom: -1px;
+			}
+			.style2 {
+				display: none;
+			}
+			.pd_pmUp {
+				background: url(../images/up.png) no-repeat center right;
+				background-size: 16px 16px;
+				padding-right: 20px;
+			}
+			.pd_pmDown {
+				background: url(../images/down.png) no-repeat center right;
+				background-size: 16px 16px;
+				padding-right: 20px;
+			}
+		</style>
+	</head>
+	<body ng-controller="getList" class="um-vp c-wh">
+		<!--内容 -->
+		<div id="content1" class="tabs_container ">
+			<!--<ul class="tab_title">
+				<li id="drugOrder" class="orderType">购药订单</li>
+				<li id="prescriptionOrder" class="orderType tabs_current_tab">处方订单</li>
+			</ul>
+			<div class="tabs_clear"></div>-->
+			<div class="tabs_content">
+				<div class="po_type ub fs7 tx-c ubb bc2">
+					<!-- 订单状态： '' 所有;'0'待付款;'1'待收货;'4'已完成 -->
+					<div ng-click="st('')" class="po_status active ub-f1" id="po_all">
+						<div class="po_img i1"></div>
+						<div>全部</div>
+					</div>
+					<div ng-click="st('0')" class="po_status ub-f1" id="po_noPay">
+						<div class="po_img i2"></div>
+						<div>待付款</div>
+					</div>
+					<div ng-click="st('1')" class="po_status ub-f1" id="po_underWay">
+						<div class="po_img i4"></div>
+						<div>待收货</div>
+					</div>
+					<div ng-click="st('4')" class="po_status ub-f1" id="po_finished">
+						<div class="po_img i5"></div>
+						<div>已完成</div>
+					</div>
+				</div>
+				<ul id="pList">
+					<li class="pItem ubt mt5 bc2" ng-repeat="i in list" ng-cloak>
+						<div class="pi_pn lh20 fs9 c2 ubb">
+							<span>处方订单号:&nbsp;&nbsp;{{i.DETAIL_ORDER_NO}}</span>
+							<div class="pi_status">
+								<span ng-if="i.DETAIL_ORDER_STATUS=='0'">待付款</span>
+								<span ng-if="i.DETAIL_ORDER_STATUS=='1'">待收货</span>
+								<span ng-if="i.DETAIL_ORDER_STATUS=='4'">已完成</span>
+							</div>
+						</div>
+						<div class="fs8 lump">
+							<dl class="ub lh22 h22">
+								<dd class="ub-f1">
+									<span class="pd_title">姓名:</span>
+									<span class="pd_msg">{{i.DETAIL_ORDER_PATIENT_NAME | limitTo:8}}</span>
+								</dd>
+								<dd class="ub-f1">
+									<span class="pd_title">年龄:</span>
+									<span class="pd_msg">{{i.DETAIL_ORDER_PATIENT_AGE}}岁</span>
+								</dd>
+								<dd class="ub-f1">
+									<span class="pd_title">性别:</span>
+									<span class="pd_msg">{{i.DETAIL_ORDER_PATIENT_SEX}}</span>
+								</dd>
+							</dl>
+							<!--<div class="lh20">
+								<span class="pd_title">联系电话:</span>
+								<span class="pd_msg" ng-cloak>{{i.DETAIL_ORDER_PATIENT_TELE}}</span>
+							</div>
+							<div class="lh20">
+								<span class="pd_title">医保卡号:</span>
+								<span class="pd_msg" ng-cloak>{{i.DETAIL_ORDER_PATIENT_CARD}}</span>
+							</div>-->
+							<div class="lh22 h22">
+								<span class="pd_title">处方号:</span>
+								<span class="pd_msg">{{i.DETAIL_ORDER_PRESC_NO}}</span>
+							</div>
+							<div class="bc2 ub h22 lh22">
+								<div class="ub-f1">{{i.DETAIL_ORDER_HOSPITAL_NAME}}</div>
+								<div class="">
+									费用: {{i.DETAIL_ORDER_TOTAL | currency: '&yen; '}}
+								</div>
+							</div>
+						</div>
+						<dd class="ubb drugListItem tx-c style1" onclick="showAll(this)">
+							<span class="pd_pmDown c2">查看详情</span>
+						</dd>
+						<table class="ubb1 style2" style="font-size: 16px;width: 100%;margin-top: -1px;line-height: 30px;border-collapse: collapse;">
+							<thead>
+								<tr class="fs8">
+									<td style="text-align: center;">通用名</td>
+									<!--<td style="text-align: center;">厂家</td>-->
+									<td style="text-align: center;">规格</td>
+									<td style="text-align: center;">数量</td>
+									<td style="text-align: center;">单价</td>
+								</tr>
+							</thead>
+							<tbody class="fs6">
+								<tr ng-repeat="drugs in i.ITEMS" ng-cloak>
+									<td style="text-align: center;">{{drugs.DRUG_NAME}}</td>
+									<!--<td style="text-align: center;">{{drugs.producer}}</td>-->
+									<td style="text-align: center;">{{drugs.DRUG_SPEC}}</td>
+									<td style="text-align: center;">{{drugs.ORDER_COUNT}}</td>
+									<td style="text-align: center;">{{drugs.DRUG_PRICE | currency : " &yen;"}}</td>
+								</tr>
+							</tbody>
+						</table>
+						<dd class="ubb1 drugListItem tx-c style2" onclick="hideAll(this)">
+							<span class="pd_pmUp c2">点击收起</span>
+						</dd>
+					</li>
+				</ul>
+				<div class="ub bc2 pt5 mt5 ubb ubt uhide" id="nop">
+					<div class="ub-f1"></div>
+					<div class="ub ub-ac ub-f1" style="width: 38%;">
+						<div class="ub-img noproduct"></div>
+						<div class="ml5">
+							<div class="fs10">很抱歉！</div>
+							<div class="fs8" id="aaa">没有为您找到相关订单。</div>
+						</div>
+					</div>
+					<div class="ub-f1"></div>
+				</div>
+			</div>
+		</div>
+	</body>
+	
+</html>
+<script type="text/javascript" src="../js/jquery.js"></script>
+<script type="text/javascript" src="../js/angular.min.js"></script>
+<script type="text/javascript" src="../js/common.js"></script>
+<script type="text/javascript" src="../js/des.js"></script>
+<script src="http://www.huidao168.com/octopus_enterprise/js/huiDaoJsBridge.js"></script>
+
+<script>
+//	var cardNo = localStorage.getItem("cardNo");
+//	var userid = 'd5487f58-a4b4-4a0c-87b8-9be23c4b8df7';
+//	getPOList(userid, '');
+	getPOList('', '');
+	$(function(){
+//		$(".orderType").click(function(){
+//			var _s = $(this);
+//			if(_s.hasClass("tabs_current_tab")){
+//				return;
+//			}
+//			_s.siblings().removeClass("tabs_current_tab");
+//			_s.addClass("tabs_current_tab");
+//			window.location.href = _s.attr("id") + ".html";
+//		});
+		//状态切换
+		$(".po_status").click(function(){
+			var _s = $(this);
+			_s.siblings().removeClass("active");
+			_s.addClass("active");
+		});
+	});
+//	function getPOList(cardNo, status){
+	function getPOList(status){
+		loading();
+		var app = angular.module('myApp', []);
+		app.controller('getList', function($http, $scope) {
+			huiDaoJsBridge.getUserInfo({
+				onResponse: function(res) {
+					console.log('getUserInfoClick res:' + res);
+					var userData = decodeURI(res);
+					userid = JSON.parse(userData).userid;
+					localStorage.setItem("userid", userid);
+					loadData($scope, $http, userid, status);
+					$scope.st = function(sts) {
+						loading();
+						loadData($scope, $http, userid, sts);
+					};
+				}
+			});
+//			$scope.st = function(sts){
+//				loading();
+//				loadData($scope, $http, '18521353025', sts);
+//			};
+//			loadData($scope, $http, '18521353025', status);
+		});
+	}
+	function loadData($scope, $http, userid, status){
+//		var param = '{"interfaceType":"A0010", "cardNO":"' + cardNo + '", "data": {"STATUS": "' + status + '"}}';
+		var param = '[{"userID":"' + userid + '","pharmacyCode":"","detailOrderStatus":"' + status + '","prescs":"1","yyyCode":"100101"}]';
+		param = strEnc(param, '111111', '', '');
+		$http({
+			method: 'GET',
+			url: GLOBAL_URL+'/Ydjyaction.action',
+			params: {
+				'json': param
+			}
+		})
+		.success(function(data) {
+			if (data.success == "1") {
+				if(data.data.length > 0){
+					$("#nop").addClass("uhide");
+				} else {
+					$("#nop").removeClass("uhide");
+				}
+				$scope.list = data.data;
+			} else {
+				alert1(data.message);
+			}
+			loaded();
+		})
+		.error(function() {
+			loaded();
+			alert1("网络连接错误！");
+		});
+	}
+	function showAll(dom){
+		var _p = $(dom).parent();
+		$(".style1", _p).slideUp();
+		$(".style2", _p).slideDown();
+	}
+	function hideAll(dom){
+		var _p = $(dom).parent();
+		$(".style2", _p).slideUp();
+		$(".style1", _p).slideDown();
+	}
+</script>

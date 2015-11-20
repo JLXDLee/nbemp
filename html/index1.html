@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html ng-app="myApp">
+
+	<head>
+		<title>宁波外配处方平台</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no">
+		<meta http-equiv="pragma" content="no-cache">
+		<meta http-equiv="cache-control" content="no-cache">
+		<meta http-equiv="expires" content="0">
+		<link rel="stylesheet" href="../css/ui-box.css">
+		<link rel="stylesheet" href="../css/ui-base.css">
+		<link rel="stylesheet" href="../css/ui-color.css">
+		<link rel="stylesheet" href="../css/win.css">
+		<link rel="stylesheet" href="../css/ui-img.css">
+		<link rel="stylesheet" href="../css/tabs.css" />
+		<style>
+			.tabs_content{margin-top: 92px;}
+			.tab_title{width: 100%;position: fixed;top: 48px;left: 0px;z-index: 99;}
+			#loading, .spinnerBg{top: 86px;}
+		</style>
+	</head>
+
+	<body class="um-vp c-wh">
+		<!-- 页头 -->
+		<header id="header" class="header">
+			<div class="title">
+				<div class="title-left"></div>
+				<div class="title-mid">宁波外配处方平台</div>
+				<div class="title-right">
+				</div>
+			</div>
+		</header>
+		<!--内容 -->
+		<div id="container" class="tabs_container" ng-controller="getList">
+			<ul class="tab_title">
+				<li ng-click="findOrder('0')" id="have" class="tabs_current_tab">待处理处方</li>
+				<li ng-click="findOrder('1')" id="haveNo">已处理处方</li>
+			</ul>
+			<div class="tabs_clear"></div>
+			<div class="tabs_content">
+				<ul id="content1">
+					<li class="ubb ubt mb5 bc2 fs8" ng-repeat="item in list" ng-cloak>
+						<div class="ub ml10 mr10 ubb h30 lh30" ng-click="toDetail(item.hospitalCode)">
+							<div class="ub-f1 tx-l">{{item.hosName}}</div>
+							<div class="ub-f1 tx-r">{{item.prescDate}}</div>
+						</div>
+						<div class="ub ml10 mr10 h30 lh30" ng-click="toDetail(item.hospitalCode ,item.id)">
+							<div class="ub-f1 tx-l">处方号：{{item.prescnNo}}</div>
+							<!--<div class="ub-f1 tx-r c4">
+								<span ng-if="item.pickMethod=='1'">自提</span>
+								<span ng-if="item.pickMethod=='3'">外配</span>
+							</div>-->
+							<div class="ub-f1 tx-r c4">
+								<span ng-if="item.currentStatus=='001'">订单未提交</span>
+								<span ng-if="item.currentStatus=='004'">订单未支付</span>
+								<span ng-if="item.currentStatus=='015'">订单已完成</span>
+							</div>
+						</div>
+					</li>
+				</ul>
+				<div class="ub bc2 pt5 ubt ubb uhide" id="nop">
+					<div class="ub-f1"></div>
+					<div class="ub ub-ac ub-f1" style="width: 38%;">
+						<div class="ub-img noproduct"></div>
+						<div class="ml5">
+							<div class="fs10">很抱歉！</div>
+							<div class="fs8" id="aaa">没有为您找到相关处方。</div>
+						</div>
+					</div>
+					<div class="ub-f1"></div>
+				</div>
+			</div>
+		</div>
+	</body>
+
+</html>
+<script type="text/javascript" src="../js/jquery.js"></script>
+<script type="text/javascript" src="../js/jquery.js"></script>
+<script type="text/javascript" src="../js/angular.min.js"></script>
+<script type="text/javascript" src="../js/common.js"></script>
+<script type="text/javascript" src="../js/des.js"></script>
+<script src="http://www.huidao168.com/octopus_enterprise/js/huiDaoJsBridge.js"></script>
+<script>
+    var cardNo = localStorage.getItem("cardNo");
+	getPreList(cardNo, '0');
+	$(function() {
+		//存医保卡号 6382,5324,2134
+//		localStorage.setItem("cardNo", "6382");
+		$("#have,#haveNo").click(function(){
+			var _s = $(this);
+			if(_s.hasClass("tabs_current_tab")){
+				return;
+			}
+			_s.siblings().removeClass("tabs_current_tab");
+			_s.addClass("tabs_current_tab");
+		});
+	});
+	//获取处方列表
+	function getPreList(cardNo, status) {
+		loading();
+		var app = angular.module('myApp', []);
+		app.controller('getList', function($http, $scope) {
+			$scope.findOrder = function(sts){
+				loading();
+				getList($http, $scope, cardNo, sts);
+			};
+			getList($http, $scope, cardNo, status);
+		});
+	}
+	function getList($http, $scope, cardNo, status){
+		var param = '{"interfaceType":"A0001", "cardNO":"' + cardNo + '","data":{"status":"' + status + '"}}';
+//		var param = '{"interfaceType":"A0001", "cardNO":"' + cardNo + '","data":{"status":"' + status + '","pageSize":"3","currentPage":"1"}}';
+		param = strEnc(param, '111111', '', '');
+		$http({
+			method: 'GET',
+			url: baseUrl,
+			params: {
+				'param': param
+			}
+		})
+		.success(function(data) {
+			if (data.PROCESS_DESC == "T") {
+				if (data.PROCESS_RESULT == "无查询结果") {
+					$("#nop").removeClass("uhide");
+					$scope.list = [];
+				} else if (data.PRESCRIPTIONS.length > 0) {
+					$("#nop").addClass("uhide");
+					//处方列表
+					$scope.list = data.PRESCRIPTIONS;
+					$scope.toDetail = function(hosCode, id) {
+						var uri = "emPrescription.html?type=" + status + "&hosId=" + hosCode;
+						if (id) {
+							uri += "&prescnNo=" + id;
+						}
+						window.location.href = uri;
+					}
+				} else {
+					alert(data.PROCESS_DESC);
+				}
+			} else {
+				alert(data.PROCESS_RESULT);
+			}
+			loaded();
+		})
+		.error(function() {
+			loaded();
+			alert("网络连接错误！");
+		});
+	}
+</script>

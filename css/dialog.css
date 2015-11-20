@@ -1,0 +1,82 @@
+@CHARSET "UTF-8";
+/*弹框*/
+.dialogBgDiv{
+	/*position:absolute;*/
+	position:fixed;
+	top:0;
+	left:0;
+	filter:Alpha(opacity=30);
+	background-color: #000;
+	z-index:1000;
+	opacity:0.3;
+	visibility: hidden;
+	width: 100%;
+	height: 100%;
+}
+.dialogMsgDiv{
+	-webkit-border-radius: 2px;
+	border-radius: 2px;
+}
+.dialogMsgDiv, .dialogTitle{
+	-webkit-border-top-left-radius: 2px;
+	border-top-left-radius: 2px;
+	-webkit-border-top-right-radius: 2px;
+	border-top-right-radius: 2px;
+}
+.dialogMsgDiv{
+	background:white;
+	position:fixed;
+	left:45%;
+	top:40%;
+	font:12px/1.6em Verdana,Geneva,Arial,Helvetica,sans-serif;
+	/* marginLeft:-255px; */
+	/* width:275px; */
+	height:160px; 
+	width: 250px;
+	text-align:center;
+	line-height:25px;
+	z-index: 1001;
+}
+.dialogTitle{
+	margin: 0;
+	padding: 2px 6px;
+	/*background-color: rgba(56, 163, 245, 0.8);*/
+	height: 35px;
+	font: 15px Verdana,Geneva,Arial,Helvetica,sans-serif;
+	cursor: pointer;
+	font-weight: bold;
+	color: #666666;
+	/*border-bottom: 2px solid #38a3f5;*/
+	border-bottom: 2px solid rgba(56, 163, 245, 0.8);
+}
+.dialogContent{
+	background:white;
+	height:140px;
+}
+.dialogTxt{
+	font-size:15px;
+	/* min-height:140px; */
+	text-align:center;
+}
+.dialogCloseButton{
+	/*width: 70%;*/
+	width: 100%;
+    /*-webkit-border-radius: 5px;
+    border-radius: 5px;*/
+}
+.dialogCloseButton, .dialogButton{
+    height: 42px;
+    line-height: 42px;
+    /*background-color: rgba(56, 163, 245, 0.8);*/
+    /*border: 1px solid #e2e2e2;*/
+   	border: 0;
+    outline: none;
+    font-size: 15px;
+    color: #666666;
+    background-color: #f1f1f1;
+}
+.dialogButton{
+	/*width: 30%;*/
+	width: 50%;
+	height: 100%;
+}

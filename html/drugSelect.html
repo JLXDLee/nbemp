@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html ng-app="myApp">
+
+	<head>
+		<title>取药选择</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no">
+		<meta http-equiv="pragma" content="no-cache">
+		<meta http-equiv="cache-control" content="no-cache">
+		<meta http-equiv="expires" content="0">
+		<link rel="stylesheet" href="../css/ui-box.css">
+		<link rel="stylesheet" href="../css/ui-base.css">
+		<link rel="stylesheet" href="../css/ui-color.css">
+		<link rel="stylesheet" href="../css/win.css">
+		<link rel="stylesheet" href="../css/ui-img.css" />
+		<style>
+			#footer {
+				width: 100%;
+				height: 48px;
+				line-height: 24px;
+				text-align: center;
+				font-size: 14px;
+				position: fixed;
+				left: 0;
+				bottom: 0;
+				z-index: 99;
+			}
+			.radio {
+				background-image: url(../images/checked.png);
+			}
+		</style>
+	</head>
+
+	<body class="um-vp c-wh">
+		<!-- 页头 -->
+		<header id="header" class="header">
+			<div class="title">
+				<div class="title-left" goback id="back"></div>
+				<div class="title-mid">取药选择</div>
+				<div class="title-right">
+				</div>
+			</div>
+		</header>
+		<!--内容 -->
+		<div id="content" ng-controller="getMsg">
+			<!--配送方式-->
+			<div class="ub h30 lh30 fs8 bc2 pl5 pr5 ubb">
+				<div class="fb mr10">配送方式：</div>
+				<div class="ub ub-ac tx-l" style="width: 200px;">
+					<!--<div onclick="choosePw(this)" class="ub">
+						<div class="mr5">
+							<input type="radio" name="unit" value="kd" id="kd" checked class="uhide">
+							<div for="kd">
+								<div class="ub ub-ac mt8">
+									<div class="ub ub-img img9 kd"></div>
+								</div>
+							</div>
+						</div>
+						<div>快递</div>
+					</div>-->
+					<div onclick="choosePw(this)" class="ub ml10">
+						<div class="mr5">
+							<input type="radio" name="unit" value="zt" id="zt" checked class="uhide">
+							<div for="zt">
+								<div class="ub ub-ac mt8">
+									<div class="ub ub-img img10 zt"></div>
+								</div>
+							</div>
+						</div>
+						<div>上门自提</div>
+					</div>
+				</div>
+			</div>
+			<!--收货地址-->
+			<!--<div class="ub bc2 h26 lh26 pl5 ub-ac ubb mt3" id="AddAddress" ng-show="!isAddress">
+				<div class="fs9 ub-f1" >
+					<div class="ub-f1 fsp14">添加收货地址</div>
+				</div>
+				<div class="ub ub-a pr5">
+					<div class="ub-img img3"></div>
+				</div>
+			</div>
+			<div class="ub bc2 ubb" ng-show="isAddress">
+				<div class="fs9" style="width: 80%;">
+					<div class="ub h25 lh25 ubb pl5 pr5">
+						<div class="ub">
+							<div class="ub ub-ac">
+								<div class="ub-img people"></div>
+							</div>
+							<div class="ml5" ng-cloak>{{address.addressName}}</div>
+						</div>
+						<div class="ub ml10">
+							<div class="ub ub-ac">
+								<div class="ub-img phone"></div>
+							</div>
+							<div class="ml5" ng-cloak>{{address.addressTel}}</div>
+						</div>
+					</div>
+					<div class="ub h25 lh25 pl5 pr5">
+						<div class="ub ub-ac">
+							<div class="ub-img place"></div>
+						</div>
+						<div class="ml5" ng-cloak>{{address.addressInfo}}</div>
+					</div>
+				</div>
+				<div class="ml10" style="width: 20%;" id="toAddress">
+					<div class="ub ub-ac mt15">
+						<div class="ub-img img8"></div>
+					</div>
+				</div>
+			</div>-->
+			<!--药店自提地址-->
+			<div class="bc2 ubb mb3">
+				<div class="fsp14 fb pl10">请选择自提地址：</div>
+				<div class=" ml10 mr10 fs7 ub ub-f1 ub-ac mt6 mb5 uba4 c15 uc-a2 bc2 h25 lh25" need id="ztaddress" style="border:1px solid #e5e5e5;">
+					<div class="fs9 c2 ub-f1" show></div>
+					<div class="h25 lh25 bc9 ubl2 ub ub-ac w20">
+						<div class="img47 ub-img mr3 ml3" img></div>
+					</div>
+					<select class="fs9">
+					</select>
+				</div>
+			</div>
+			<!--药品 患者信息-->
+			<div class="mt5 bc2 fs8">
+				<div class="ub h25 lh25 ubb pl5 pr5" id="todrugDetail">
+					<div class="ub-f1" ng-cloak>{{presc.hosName}}</div>
+					<div class="ub ub-ac">
+						<div class="ub-img img3"></div>
+					</div>
+				</div>
+				<div class="ubb">
+					<div class="ub h25 lh25 pl10 pr10">
+						<div class="ub ub-f1">
+							<div>姓名：</div>
+							<div ng-cloak>{{presc.patientName}}</div>
+						</div>
+						<div class="ub ub-f1">
+							<div>性别：</div>
+							<div ng-cloak>{{presc.sex}}</div>
+						</div>
+						<div class="ub ub-f1">
+							<div>年龄：</div>
+							<div ng-cloak>{{presc.age}}</div>
+						</div>
+					</div>
+					<div class="ub h25 lh25 pl10 pr10">
+						<div>身份证号：</div>
+						<div ng-cloak>{{presc.identityCard}}</div>
+					</div>
+					<div class="ub h25 lh25 pl10 pr10">
+						<div>医保卡号：</div>
+						<div ng-cloak>{{'ddd'}}</div>
+					</div>
+				</div>
+				<div class="ubb">
+					<div class="ub h25 lh25 pl10 pr10">
+						<div>处方号：</div>
+						<div ng-cloak>{{presc.prescnNo}}</div>
+					</div>
+					<div class="ub h25 lh25 pl10 pr10">
+						<div>诊断：</div>
+						<div ng-cloak>{{presc.diagnosis}}</div>
+					</div>
+				</div>
+			</div>
+			<!--footer-->
+			<footer id="footer" class="ub footer ubt">
+				<div class="ub-f1 pl5 bc2">
+					<div class="ub">
+						<div class="ub">
+							<div>定金金额：</div>
+							<div ng-cloak>{{yzf| currency:'&yen;'}}</div>
+						</div>
+					</div>
+					<div class="ub">
+						<div>商品金额：</div>
+						<div ng-cloak>
+							&yen;<span id="totalPrice">{{presc.prescFee | number: 2}}</span>
+						</div>
+					</div>
+				</div>
+				<div class=" bc1 c1" style="line-height: 48px; width: 30%;" id="addOrder">提交预订单</div>
+			</footer>
+		</div>
+	</body>
+
+</html>
+<script type="text/javascript" src="../js/jquery.js"></script>
+<script type="text/javascript" src="../js/common.js"></script>
+<script type="text/javascript" src="../js/angular.min.js"></script>
+<script type="text/javascript" src="../js/des.js"></script>
+<script>
+	iP2 = {};
+	var prescNo = request("prescNo"); //处方号
+	var code = request("code"); //药店编码
+	var type = request("type");
+	var hosId = request("hosId");
+	getdrugSelect(prescNo, code); //获取取药选择信息
+	var pickMethod = "";
+	var yzf = request("yzf");
+	$(function() {
+		//自提地址
+		getAddress(code);
+		$("#ztaddress").on("change", iP2.chooseSelect);
+		//编辑收货地址
+		//		$("#toAddress").click(function() {
+		//			window.location.href = "editAddr.html?prescNo=" + prescNo + "&type=" + type + "&hosId=" + hosId + "&code=" + code;
+		//		});
+		//添加收货地址
+		//		$("#AddAddress").click(function() {
+		//			window.location.href = "editAddr.html?prescNo=" + prescNo + "&type=" + type + "&hosId=" + hosId + "&code=" + code;
+		//		});
+		//查看药品详情
+		$("#todrugDetail").click(function() {
+			window.location.href = "drugDetail.html?prescNo=" + prescNo + "&code=" + code + "&type=" + type + "&hosId=" + hosId;
+		});
+		//返回上一页
+		$("#back").click(function() {
+			window.location.href = "searchParity.html?prescNo=" + prescNo + "&type=" + type + "&hosId=" + hosId + "&fromUrl=" + localStorage.getItem("fromUrl");
+		});
+		checkType();
+		//提交预订单
+		$("#addOrder").click(function() {
+			var allPrice = $.trim($("#totalPrice").text());
+			var UserID = localStorage.getItem("userid");
+			var AddressID = $("#ztaddress").attr("need");
+			var isInvoice = 0;
+			addOrder(prescNo, pickMethod, code, allPrice, UserID, AddressID, isInvoice);
+		});
+	});
+	//获取取药选择信息
+	function getdrugSelect(prescNo, code) {
+			loading();
+			var param = '{"interfaceType":"A0007", "data":{"PRESC_ID":"' + prescNo + '","phCode":"' + code + '"}}';
+			param = strEnc(param, '111111', '', '');
+			var app = angular.module('myApp', []);
+			app.controller('getMsg', function($http, $scope) {
+				$http({
+						method: 'GET',
+						url: baseUrl,
+						params: {
+							'param': param
+						}
+					})
+					.success(function(data) {
+						if (data.PROCESS_DESC == "T") {
+							if (data.DATA) {
+								$scope.presc = data.DATA.PRESCS; //处方信息
+								$scope.yzf = request("yzf");
+								//								if (data.DATA.ADDRESS) {
+								//									$scope.address = data.DATA.ADDRESS; //地址
+								//									$scope.isAddress = true;
+								//								} else {
+								//									$scope.isAddress = false;
+								//								}
+							}
+						} else {
+							alert(data.PROCESS_RESULT);
+						}
+						loaded();
+					})
+					.error(function() {
+						loaded();
+						alert("网络连接错误！");
+					});
+			});
+		}
+		//获取自提的地址
+
+	function getAddress(pc) {
+			var enResult = strEnc("[{\"pharmacyCode\":\"" + pc + "\",\"yyyCode\":\"100020\"}]", "100001", "", "");
+			$.ajax({
+				url: GLOBAL_URL + "/Ydjyaction.action?json=" + enResult,
+				type: "GET",
+				timeout: 60000,
+				beforeSend: function() {}, //添加loading信息
+				success: function(productInfo, textStatus) {
+					var productInfo = JSON.parse(productInfo);
+					if (productInfo.success == "1") {
+						$("#ztaddress select").empty();
+						for (var i in productInfo.data) {
+							var option = $('<option></option>');
+							//自提地址
+							option.val(productInfo.data[i].ADDRESS_ID);
+							option.text(productInfo.data[i].ADDRESS_AREA + productInfo.data[i].ADDRESS_INFO + productInfo.data[i].ADDRESS_TEL);
+							$("#ztaddress select").append(option);
+							if (localStorage.getItem("code")) {
+								iP2.setOption($("#ztaddress"), localStorage.getItem("code"));
+							} else {
+								iP2.setOption($("#ztaddress"), productInfo.data[0].ADDRESS_ID);
+							}
+						}
+					} else {
+						//alert("提交失败");
+					}
+				}, //清掉loading信息
+				error: function(xmlHttpRequest, error) {
+					alert("网络连接错误！");
+				}
+			});
+		}
+		//选择下拉列表
+	iP2.chooseSelect = function() {
+		var that = $(this).find("select");
+		iP2.setOption(that.parents("[need]"), that.val());
+	};
+	iP2.setOption = function(elem, code) {
+		var select = elem.find("select");
+		select.val(code);
+		localStorage.setItem("code", code);
+		var codeName = select.find("option:selected").text();
+		elem.find("[show]").text(codeName);
+		elem.attr("need", code);
+	};
+	//保存表单信息
+	function addOrder(prescNo, pickMethod, phCode, allPrice, UserID, AddressID, isInvoice) {
+			loading();
+			var param = '{"interfaceType":"A0003", "data":{"PRESC_ID":"' + prescNo + '","pickMethod":"' + pickMethod + '","phCode":"' + phCode + '","allPrice":"' + allPrice + '","UserID":"' + UserID + '","AddressID":"' + AddressID + '","isInvoice":"' + isInvoice + '"}}';
+			param = strEnc(param, '111111', '', '');
+			$.ajax({
+				type: "get",
+				url: baseUrl,
+				data: {
+					'param': param
+				},
+				success: function(data) {
+					loaded();
+					if (data.success == 1) {
+						var orderid=data.data.DETAIL_ORDER_NO;
+						var payid=data.data.DRUG_SUPPLIER_PAY;
+						if (yzf == "0.00") {
+								window.location.href = "index1.html";
+						}
+						else
+						{
+							window.location.href="drugPay.html?orderid="+orderid+"&payid="+payid+"&allPrice="+ request("yzf");
+						}
+					} else {
+						alert(data.message);
+					}
+				},
+				error: function() {
+					loaded();
+					alert("网络连接错误！");
+				}
+			});
+		}
+		//选择支付方式
+
+	function choosePw(dom) {
+		$(dom).find("input")[0].checked = true;
+		$(dom).siblings().find("input")[0].checked = false;
+		checkType();
+	}
+
+	function checkType() {
+		var chkObj = document.getElementsByName("unit");
+		for (var i = 0; i < chkObj.length; i++) {
+			if (chkObj[i].checked) {
+				if (chkObj[i].value == "zt") //上门自提
+				{
+					pickMethod = "0";
+					$(".zt").addClass("img9").removeClass("img10");
+					$(".kd").removeClass("img9").addClass("img10");
+				} else if (chkObj[i].value == "kd") //快递
+				{
+					pickMethod = "1";
+					$(".zt").addClass("img10").removeClass("img9");
+					$(".kd").addClass("img9").removeClass("img10");
+				}
+			}
+		}
+	}
+</script>

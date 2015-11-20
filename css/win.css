@@ -1,0 +1,41 @@
+.header{
+
+}
+#header .title{
+    display: -webkit-box !important;
+    height:3.0em;
+    background-color:#38a3f5;
+    -webkit-box-align:center;
+}
+.title-left{
+    width:3em;  
+    height: 3em;
+    display: block;
+}
+
+.title-mid{
+    -webkit-box-flex: 1;
+    text-align:center;
+	font-size: 19px;
+    color:#fff;
+}
+.title-right{
+    width:3em;
+	height:3em; 
+	line-height: 3em;
+	text-align: center;
+}
+.title-right1{
+	width:2.7em;
+	height:1.75em; 
+    background-repeat: no-repeat;
+}
+/* 内容 */
+.content{
+    -webkit-box-flex:1;
+    height:100%;
+}
+[goback]{
+    background: url(../images/img4.png) no-repeat center center;
+	background-size:30% 50%;
+}

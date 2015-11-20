@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html ng-app="myApp">
+
+	<head>
+		<title>编辑收货地址</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no">
+		<meta http-equiv="pragma" content="no-cache">
+		<meta http-equiv="cache-control" content="no-cache">
+		<meta http-equiv="expires" content="0">
+		<link rel="stylesheet" href="../css/ui-box.css">
+		<link rel="stylesheet" href="../css/ui-base.css">
+		<link rel="stylesheet" href="../css/ui-color.css">
+		<link rel="stylesheet" href="../css/win.css">
+		<link rel="stylesheet" href="../css/ui-img.css" />
+		<style>
+			[show]{padding: 0 5px;}
+			#addressInfo{
+				resize: none;
+			    box-sizing: border-box;
+			    height: 70px;
+			    width: 100%;
+			    padding: 5px 10px;
+			}
+		</style>
+	</head>
+
+	<body class="um-vp c-wh">
+		<!-- 页头 -->
+		<header id="header" class="header">
+			<div class="title">
+				<div class="title-left" goback id="back"></div>
+				<div class="title-mid">编辑收货地址</div>
+				<div class="title-right"></div>
+			</div>
+		</header>
+		<!--内容 -->
+		<form id="content" name="form" ng-controller="getAddr">
+			<div class="bc2 h30 lh30 ubb pl5">
+				<input type="text" id="name" name="shName" value="{{addr.addressName}}" style="height:30px; line-height:30px; width: 90%;" min="2" maxlength="14" placeholder="收货人姓名">
+				<!--<textarea id="name" name="name" ng-bind="head.name" style="height:30px; line-height:30px;" min="2" maxlength="14" placeholder="收货人姓名"></textarea>-->
+			</div>
+			<div class="bc2 h30 lh30 ubb pl5">
+				<input type="tel" id="tel" name="phone" value="{{addr.addressTel}}" placeholder="联系电话" style="height:30px; line-height:30px;" maxlength="11" oninput="value=this.value.replace(/\D+/g,'')">
+				<!--<textarea id="tel" name="phone" ng-bind="head.telphone" placeholder="联系电话" style="height:30px; line-height:30px;" maxlength="11" oninput="value=this.value.replace(/\D+/g,'')"></textarea>-->
+			</div>
+			<div class="ub bc2 h30 lh30 ubb pl5">
+				<div class="ub ub-f1 ub-ac mt6 uba4 c15 uc-a2 bc2  h18 lh18" need id="area" style="border: 1px solid #e5e5e5;">
+					<div class="fs9 c2 ub-f1" show></div>
+					<div class="img5 ub-img mr5" img></div>
+					<select class="fs9">
+						<!--<option value="" class="c74" selected>请选择市</option>-->
+						<option value={{region.id}} selected>{{region.localName}}</option>
+					</select>
+				</div>
+				<div class="ml10 ub ub-f1 ub-ac mt6 mr10 uba4 c15 uc-a2 bc2 h18 lh18" need id="subArea" style="border: 1px solid #e5e5e5;">
+					<div class="fs9 c2 ub-f1" show>请选择区域</div>
+					<div class="img5 ub-img mr5" img></div>
+					<select class="fs9" name="subId">
+						<option value="" selected>请选择区域</option>
+						<option ng-repeat="item in list" value={{item.id}}>{{item.localName}}</option>
+					</select>
+				</div>
+			</div>
+			<div class="bc2 h50 lh50 ubb pt3 ub-as">
+				<textarea id="addressInfo" ng-bind="addr.addressInfo" name="adress" placeholder="详细地址" name="text" maxlength="30"></textarea>
+			</div>
+			<div class="ub fs8 bc2 h25 lh25 pl10 pr10 ubb">
+				<div class="ub-f1">设为默认地址</div>
+				<div class="ck checked"></div>
+			</div>
+			
+			<div class="ub mt10">
+				<div class="ub-f1"></div>
+				<div class="ub-f1 bc1 h25 lh25 c1 fs10 uc-a4" style="width:90%;text-align:center;" id="saveAddr">保存并使用</div>
+				<div class="ub-f1"></div>
+			</div>
+			<input type="hidden" name="save" value="SAVE" />
+		</form>
+		
+		<!--<footer id="footer" class="footer">
+			<div id="toSearch">搜药比价</div>
+		</footer>-->
+	</body>
+
+</html>
+
+<script type="text/javascript" src="../js/jquery.js"></script>
+<script type="text/javascript" src="../js/angular.min.js"></script>
+<script type="text/javascript" src="../js/common.js"></script>
+<script type="text/javascript" src="../js/des.js"></script>
+<script>
+    var type=request("type");
+	var hosId=request("hosId");
+	var prescNo = request("prescNo");
+	var code=request("code");
+	//获取地址信息
+	getAddress();
+	$(function(){
+		//返回上一页
+		$("#back").click(function(){
+			window.location.href = "drugSelect.html?type="+type+"&hosId="+hosId+"&prescNo="+prescNo+"&code="+code;
+		});
+		//单选框事件
+		$(".ck").click(function(){
+			$(this).toggleClass("checked");
+		});
+		//表单提交
+		$("#saveAddr").click(function(){
+			saveAddr();
+		});
+		$("#subArea,#area").on("change", select.chooseSelect);
+	});
+	//获取地址信息
+	function getAddress() {
+		loading();
+		var cardNo = localStorage.getItem("cardNo");
+		var param = '{"interfaceType":"A0009", "cardNO":"' + cardNo + '"}}';
+		param = strEnc(param, '111111', '', '');
+		var app = angular.module('myApp', []);
+		app.controller('getAddr', function($http, $scope) {
+			//获取地区方法
+			$http({
+				method: 'GET',
+				url: baseUrl,
+				params: {
+					'param': param
+				}
+			})
+			.success(function(data) {
+				if (data.PROCESS_DESC == "T") {
+					if (data.DATA) {
+						$scope.addr = data.DATA.ADRESS;
+						$scope.region = data.DATA.MARKET;
+						$scope.list = data.DATA.PROPER; 
+						var addr = data.DATA.ADRESS;
+						var region = data.DATA.MARKET;
+						select.setOption($("#area"), region.id, region.localName);
+						if(addr){
+							setTimeout('select.setOption($("#subArea"), '+addr.subAreaId+')', 500);
+						}
+					} else {
+						alert(data.PROCESS_RESULT);
+					}
+				} else {
+					alert(data.PROCESS_RESULT);
+				}
+				loaded();
+			})
+			.error(function() {
+				loaded();
+				alert("网络连接错误！");
+			});
+		});
+	}
+	//提交
+	function saveAddr() {
+		var valid = validForm();
+		if (valid == false) return;
+		saveToUse();
+	}
+	//保存表单信息
+	function saveToUse() {
+		loading();
+		var cardNo = localStorage.getItem("cardNo");
+		var form = $("form#content");
+		var data = formatFormParams(form, false);
+		var param = '{"interfaceType":"A0009", "cardNO":"' + cardNo + '","data":'+data+'}';
+		param = strEnc(param, '111111', '', '');
+		$.ajax({
+			type: "get",
+			url: baseUrl,
+			data: {
+				'param': param
+			},
+			success: function(data) {
+				if (data.PROCESS_DESC == "T") {
+					alert("保存成功", function(){
+						window.location.href = "drugSelect.html?type="+type+"&hosId="+hosId+"&prescNo="+prescNo+"&code="+code;
+					});
+				} else {
+					alert(data.PROCESS_RESULT);
+				}
+				loaded();
+			},
+			error: function() {
+				loaded();
+				alert("网络连接错误！");
+			}
+		});
+	}
+	//表单验证
+	function validForm() {
+		var name = $.trim($("#name").val());
+		var tel = $.trim($("#tel").val());
+		var areaId = $.trim($("#area select").val());
+		var subAreaId = $.trim($("[name=subId]").val());
+		var addressInfo = $.trim($("#addressInfo").val());
+		if (!name) {
+			alert("请输入收货人姓名");
+			return false;
+		} else if (name.length < 2 || name.length > 14) {
+			alert("收货人姓名在 2 到 14 位之间");
+			return false;
+		}
+		if (!tel) {
+			alert("请输入联系电话");
+			return false;
+		} else if (tel.length < 11 || tel.length > 11) {
+			alert("联系电话为 11 位数字");
+			return false;
+		}
+		if (!areaId) {
+			alert("请选择市");
+			return false;
+		}
+		if (!subAreaId) {
+			alert("请选择区域");
+			return false;
+		}
+		if (!addressInfo) {
+			alert("请输入详细地址");
+			return false;
+		}
+		return true;
+	}
+</script>

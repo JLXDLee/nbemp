@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html ng-app="myApp">
+
+	<head>
+		<title>外配处方</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no">
+		<meta name="format-detection" content="telephone=no,email=no">
+		<meta http-equiv="pragma" content="no-cache">
+		<meta http-equiv="cache-control" content="no-cache">
+		<meta http-equiv="expires" content="0">
+		<link rel="stylesheet" href="../css/ui-box.css">
+		<link rel="stylesheet" href="../css/ui-base.css">
+		<link rel="stylesheet" href="../css/ui-color.css">
+		<link rel="stylesheet" href="../css/win.css">
+		<link rel="stylesheet" href="../css/ui-img.css" />
+		<style>
+			#content {
+				margin-bottom: 3em;
+			}
+			.pd_umItem {
+				padding: 5px 10px;
+			}
+			.pd_msg {
+				/*font-size: 12px;*/
+				color: #666;
+				padding-left: 5px;
+			}
+			.lump,
+			.lump1 {
+				border-bottom: 1px solid #E0E0E0;
+				margin-top: 10px;
+				background-color: #FFFFFF;
+				padding: 5px 10px 0px;
+			}
+			.lump {
+				border-top: 1px solid #E0E0E0;
+			}
+			.pliTitle {
+				margin: -5px -8px 0px;
+				padding: 0px 8px;
+			}
+			.pliTips{
+				font-size: 12px;
+				color: #999;
+				background-color: #e9e9e9;
+				/*height: 20px;*/
+				line-height: 20px;
+				margin: 0px -8px;
+				padding: 0px 8px;
+			}
+			.pliName {
+				padding-left: 10px;
+			}
+			.pliDate{
+				padding-left: 20px;
+			}
+			#footer {
+				width: 100%;
+				height: 48px;
+				color: #fff;
+				line-height: 48px;
+				background-color: #38a3f5;
+				text-align: center;
+				font-size: 19px;
+				position: fixed;
+				left: 0;
+				bottom: 0;
+				z-index: 99;
+			}
+		</style>
+	</head>
+
+	<body class="um-vp c-wh" ng-controller="getMsg">
+		<!-- 页头 -->
+		<header id="header" class="header">
+			<div class="title">
+				<div class="title-left" goback id="back"></div>
+				<div class="title-mid">外配处方</div>
+				<div class="title-right"></div>
+			</div>
+		</header>
+		<!--内容 -->
+		<div id="content">
+			<div id="pd_um" class="bc2 ubb1">
+				<div class="pd_umItem">
+					<div class="lh20">
+						<span class="pd_title fsp14">医院:</span>
+						<span class="pd_msg fsp14" ng-cloak>{{head.hosName}}</span>
+						<input type="hidden" value="head.hospitalCode" />
+					</div>
+				</div>
+			</div>
+			<div class="fs8 lump">
+				<dl class="ub lh20">
+					<dd class="ub-f1">
+						<span class="pd_title">姓名:</span>
+						<span class="pd_msg" ng-cloak>{{head.patientName | limitTo:8}}</span>
+					</dd>
+					<dd class="ub-f1">
+						<span class="pd_title">年龄:</span>
+						<span class="pd_msg" ng-cloak>{{head.age}}岁</span>
+					</dd>
+					<dd class="ub-f1">
+						<span class="pd_title">性别:</span>
+						<span class="pd_msg" ng-cloak>{{head.sex}}</span>
+					</dd>
+				</dl>
+				<div class="lh20">
+					<span class="pd_title">医保卡号:</span>
+					<span class="pd_msg" ng-cloak>{{head.patientCard}}</span>
+				</div>
+				<div class="lh20">
+					<span class="pd_title">身份证号:</span>
+					<span class="pd_msg" ng-cloak>{{head.identityCard}}</span>
+				</div>
+			</div>
+			<ul id="pList">
+				<li class="pListItem lump1" ng-repeat="item in list" ng-cloak>
+					<div class="lh25 fs8 ub  ubb1 bc4 pliTitle">
+						<div ng-class="$index==0?'ck checked':'ck'" onclick="checkRadio(this)" ng-click="curPStation(item.prescStatus)" id="{{item.prescId}}"></div>
+						<div class="pliName ub-f1">处方号:&nbsp;{{item.prescNo}}</div>
+						<div class="pliDate ub-f1 tx-r" ng-cloak>日期:&nbsp;{{item.prescDate | date : 'yyyy-MM-dd'}}</div>
+					</div>
+					<div ng-if="item.prescStatus!='001'" class="pliTips">
+						处方订单已提交！药店：{{item.phName}}，总价：{{item.prescFee | currency: '&yen;'}}
+					</div>
+					<div class="h20 lh20 ub ubb1">
+						<div class="pd_title fsp14">诊断结果:</div>
+						<div class="pd_msg fsp14" ng-cloak>{{item.diagnosis}}</div>
+					</div>
+					<div class="lh20">
+						<div class="pd_title fsp14">药品明细</div>
+						<div class="pb10">
+							<table style="border:1px solid #e5e5e5; border-collapse:collapse; width: 100%;line-height: 30px;">
+								<thead>
+									<tr class="fs8">
+										<td style="text-align: center;">通用名</td>
+										<td style="text-align: center;">厂家</td>
+										<td style="text-align: center;">规格</td>
+										<td style="text-align: center;">数量</td>
+										<td style="text-align: center;">单位</td>
+									</tr>
+								</thead>
+								<tbody class="fs6">
+									<tr ng-repeat="drugs in item.DETAIL" ng-cloak>
+										<td style="text-align: center;">{{drugs.gname}}</td>
+										<td style="text-align: center;">{{drugs.producer}}</td>
+										<td style="text-align: center;">{{drugs.spec}}</td>
+										<td style="text-align: center;">{{drugs.quantity}}</td>
+										<td style="text-align: center;">{{drugs.msunitno}}</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+					</div>
+				</li>
+			</ul>
+		</div>
+		<footer id="footer" class="footer" ng-if="isShow" ng-style="isShowStyle" style="display: none;">
+			<!--处方当前状态:001生成处方(待支付),002 作废,003 退药,004 订单已提交(定金已付),005 已支付(待发药),010 已发药(待签收),015 已签收-->
+			<div id="toSearch" onclick="toSearch()">搜药比价</div>
+			<!--<div id="confirm" ng-if="status='010'" ng-click="confirm()">确认收货</div>-->
+		</footer>
+	</body>
+</html>
+
+<script type="text/javascript" src="../js/jquery.js"></script>
+<script type="text/javascript" src="../js/angular.min.js"></script>
+<script type="text/javascript" src="../js/common.js"></script>
+<script type="text/javascript" src="../js/des.js"></script>
+<script>
+	//获取外配处方
+	getEMP();
+	$(function() {
+		//返回上一页
+		$("#back").click(function() {
+			window.location.href = "index1.html";
+//			window.location.href = 'prescriptionList.html?type=' + request("type");
+		});
+		//搜索比价
+		$("#toSearch").click(function() {
+			window.location.href = 'searchParity.html';
+		});
+		//单选框事件
+		$(".ck").click(function() {
+			var _s = $(this);
+			$(".ck").removeClass("checked");
+			_s.toggleClass("checked");
+		});
+		//搜药比价
+//		$("#toSearch").click(function(){
+//			var prescNo = $(".ck.checked").attr("id");
+//			var curUrl = window.location.href;
+//			window.location.href="searchParity.html?prescNo="+prescNo+"&type="+request("type")+"&hosId="+request("hosId")+"&fromUrl="+curUrl;
+//		});
+	});
+	//搜药比价
+	function toSearch(){
+		var prescNo = $(".ck.checked").attr("id");
+		var curUrl = window.location.href;
+		window.location.href="searchParity.html?prescNo="+prescNo+"&type="+request("type")+"&hosId="+request("hosId")+"&fromUrl="+curUrl;
+	}
+	//获取外配处方
+	function getEMP() {
+		loading();
+		//医保卡号
+		var cardNO = localStorage.getItem("cardNo");
+		//处方类型 0:未取药; 1:取药
+		var type = request("type");
+		//医院编码
+		var hosId = request("hosId");
+		//处方ID
+		var PRESC_ID = request("prescnNo");
+		var param = "";
+		if (PRESC_ID) {
+			//单个处方
+			param = '{"interfaceType":"A0005", "cardNO":"' + cardNO + '", "data":{"PRESC_ID":"' + PRESC_ID + '","type":"' + type + '","hosId":"' + hosId + '"}}';
+		} else {
+			//医院处方列表
+			param = '{"interfaceType":"A0006", "cardNO":"' + cardNO + '", "data":{"status":"' + type + '","hosCode":"' + hosId + '"}}';
+		}
+		param = strEnc(param, '111111', '', '');
+		var app = angular.module('myApp', []);
+		app.controller('getMsg', function($http, $scope) {
+			$scope.isShow = false;
+			$scope.curPStation = function(status){
+				if(status == '001'){
+					$scope.isShow = true;
+					$scope.isShowStyle = {
+						display: 'block'
+					}
+				} else {
+					$scope.isShow = false;
+					$scope.isShowStyle = {
+						display: 'none'
+					}
+				}
+			};
+			$http({
+				method: 'GET',
+				url: baseUrl,
+				params: {
+					'param': param
+				}
+			})
+			.success(function(data) {
+				if (data.PROCESS_DESC == "T") {
+					if (data.DATA) {
+						//处方列表
+						$scope.list = data.DATA.DETATILS;
+						$scope.head = data.DATA.HEADER;
+						if(data.DATA.DETATILS[0].prescStatus == '001'){
+							$scope.isShow = true;
+							$scope.isShowStyle = {
+								display: 'block'
+							}
+						} else {
+							$scope.isShow = false;
+							$scope.isShowStyle = {
+								display: 'none'
+							}
+						}
+						//确认收货
+//						$scope.confirm = function() {
+//							confirm("您确认收到药物了吗？", receiptConfirm);
+//						};
+					} else {
+						alert(data.PROCESS_RESULT);
+					}
+				} else {
+					alert(data.PROCESS_RESULT);
+				}
+				loaded();
+			})
+			.error(function() {
+				loaded();
+				alert("网络连接错误！");
+			});
+		});
+	}
+	//确认收货
+	function receiptConfirm() {
+		loading();
+		//医保卡号
+		var cardNO = localStorage.getItem("cardNo");
+		//处方ID
+		var PRESC_ID = request("prescnNo");
+		var param = '{"interfaceType":"A0004", "cardNO":"' + cardNO + '", "data":{"PRESC_ID":"' + PRESC_ID + '"}}';
+		param = strEnc(param, '111111', '', '');
+		$.ajax({
+			type: "get",
+			url: baseUrl,
+			data: {
+				param: param
+			},
+			success: function(data) {
+				loaded();
+				if (data.success == "1") {
+					alert("确认成功 ", function() {
+						window.location.href = "index1.html";
+					});
+				} else {
+					alert(data.message);
+				}
+			},
+			error: function() {
+				loaded();
+				alert("网络连接错误");
+			}
+		});
+	}
+	//单选框事件
+	function checkRadio(dom){
+		$(".ck").removeClass("checked");
+		$(dom).addClass("checked");
+	}
+</script>
