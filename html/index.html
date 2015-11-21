@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html ng-app="myApp">
+
+	<head>
+		<title>宁波外配处方平台</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no">
+		<meta content="telephone=no" name="format-detection">
+		<meta http-equiv="pragma" content="no-cache">
+		<meta http-equiv="cache-control" content="no-cache">
+		<meta http-equiv="expires" content="0">
+		<style>
+			body{
+				width: 100%;
+				height: 100%;
+			}
+			.um-vp{
+				-webkit-text-size-adjust: none;
+				-webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+				-webkit-user-select:none;
+			}
+			.vAlign{
+				position: relative;
+				top: 50%;
+				-webkit-transform: translateY(-50%);
+				-moz-transform: translateY(-50%);
+				-ms-transform: translateY(-50%);
+				transform: translateY(-50%);
+			}
+		</style>
+		<script type="text/javascript" src="../js/jquery.js"></script>
+		<script type="text/javascript" src="../js/common.js"></script>
+		<script src="http://www.huidao168.com/octopus_enterprise/js/huiDaoJsBridge.js"></script>
+	</head>
+
+	<body class="um-vp c-wh">
+		<script>
+			//获取用户信息
+			huiDaoJsBridge.getUserInfo({
+				onResponse: function(res) {
+					var userData = decodeURI(res);
+					var userid = JSON.parse(userData).userid;
+					cardNo = JSON.parse(userData).medicareNo;
+//					alert(cardNo, function(){
+//						localStorage.setItem("cardNo", cardNo);
+//						window.location.href = 'index1.html';
+//					});
+	                localStorage.setItem("userid", userid);
+					localStorage.setItem("cardNo", cardNo);
+					window.location.href = 'index1.html';
+				}
+			});
+		</script>
+	</body>
+
+</html>

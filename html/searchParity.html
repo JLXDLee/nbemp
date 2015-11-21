@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html ng-app="myApp">
+
+	<head>
+		<title>搜索比价</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no">
+		<meta http-equiv="pragma" content="no-cache">
+		<meta http-equiv="cache-control" content="no-cache">
+		<meta http-equiv="expires" content="0">
+		<link rel="stylesheet" href="../css/ui-box.css">
+		<link rel="stylesheet" href="../css/ui-base.css">
+		<link rel="stylesheet" href="../css/ui-color.css">
+		<link rel="stylesheet" href="../css/win.css">
+		<link rel="stylesheet" href="../css/ui-img.css" />
+		<script src="http://api.map.baidu.com/components?ak=dAnQhwTbAmdFn9Ry6LNmKWYB&v=1.0"></script>
+		<style>
+			html, body{
+				width: 100%;
+				height: 100%;
+			}
+			#footer {
+				width: 100%;
+				height: 48px;
+				color: #fff;
+				line-height: 48px;
+				background-color: #38a3f5;
+				text-align: center;
+				font-size: 19px;
+				position: fixed;
+				left: 0;
+				bottom: 0;
+				z-index: 99;
+			}
+			.active {
+				color: #38a3f5;
+			}
+			#orderByLayer {
+				position: fixed;
+				/*top: 85px;*/
+				top: 113px;
+				width: 100%;
+				height: 100%;
+				display: none;
+				z-index: 100;
+			}
+			.oblBg {
+				position: absolute;
+				width: 100%;
+				height: 100%;
+				background: #000;
+				opacity: 0.3;
+				z-index: 100;
+			}
+			.oblItem {
+				line-height: 32px;
+				padding-left: 20px;
+				border-bottom: 1px solid #E0E0E0;
+				background: #FFFFFF;
+				z-index: 101;
+			}
+			#filterRule>div {
+				width: 33%;
+			}
+			#curLocation {
+				overflow: hidden;
+			}
+			/*百度地图兼容性CSS*/
+			
+			#content {
+				width: 100%;
+				position: absolute;
+				top: 3em;
+				margin-top: 0;
+				padding-bottom: 50px;
+			}
+			.locbar.row.-ft-tertiary {
+				background-color: #FFFFFF;
+			}
+			.lbs-tag .page-nav .title.-ft-large {
+				width: 99%;
+			}
+			.lbs-tag.-lbs-page {
+				z-index: 102;
+			}
+		</style>
+	</head>
+
+	<body class="um-vp c-wh">
+		<!-- 页头 -->
+		<header id="header" class="header">
+			<div class="title">
+				<div class="title-left" goback id="back"></div>
+				<div class="title-mid">搜药比价</div>
+				<div class="title-right">
+				</div>
+			</div>
+		</header>
+		<!--内容 -->
+		<div id="content" ng-controller="getMsg">
+			<lbs-geo id="geo" city="宁波" enable-modified="false" show-ui="true"></lbs-geo>
+			<!--比价条件-->
+			<div class="ub bc2 fs8 h25 lh25 ubb" id="filterRule">
+				<div class="ub" id="orderBy" style="width: 35%;">
+					<div class="pl10 orderByTitle">综合排序</div>
+					<div class="ub ub-ac ml2">
+						<div class="ub-img img6"></div>
+					</div>
+				</div>
+				<div class="ub ubl ubr" id="orderByDistance">
+					<div class="pl10">距离优先</div>
+					<div class="ub ub-ac ml2">
+						<div class="ub-img img7"></div>
+					</div>
+				</div>
+				<div class="pl10 pr10" id="curLocation">定位中...</div>
+			</div>
+			<!--比价结果-->
+			<div class="mt10 bc2">
+				<!--<select ng-model="order" name="order" id="filterOrder" style="width: 0;height: 0;">
+					<option value="PHACMAYS.allPrice" id="filter1">1</option>
+					<option value="-PHACMAYS.allPrice" id="filter2">2</option>
+				</select>-->
+				<div class="h20 lh20 bc4 ubb">
+					<div class="fs9 pl10" ng-cloak>处方号：{{presc.prescId}}</div>
+				</div>
+				<div class="fs10 pl10 h22 lh22 bc2">处方用药</div>
+				<div class="pl10 pr10  bc2 pb10 ubb">
+					<table style="border:1px solid #e5e5e5; border-collapse:collapse; width: 100%;line-height: 30px;">
+						<thead>
+							<tr class="fs8">
+								<td style="width: 10%; text-align: center;">序号</td>
+								<td style="width: 25%;text-align: center;">药品名</td>
+								<td style="width: 30%; text-align: center;">厂家</td>
+								<td style="width: 15%;text-align: center;">规格</td>
+								<td style="width: 10%;text-align: center;">数量</td>
+								<td style="width: 10%;text-align: center;">单位</td>
+							</tr>
+						</thead>
+						<tbody class="fs6">
+							<tr ng-repeat="drugs in presc.DROUGS" ng-cloak>
+								<td style="width: 10%; text-align: center;">{{$index+1}}</td>
+								<td style="width: 25%;text-align: center;">{{drugs.DRUG_NAME}}</td>
+								<td style="width: 30%; text-align: center;">{{drugs.PRODUCER}}</td>
+								<td style="width: 15%;text-align: center;">{{drugs.DRUG_SPEC}}</td>
+								<td style="width: 10%;text-align: center;">{{drugs.QUANTITY}}</td>
+								<td style="width: 10%;text-align: center;">{{drugs.MSUNITNO}}</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+			<!--厂家列表-->
+			<div class="listItem" ng-repeat="shops in list | orderBy : order" ng-cloak>
+				<div class="mt10 bc2 fs8">
+					<div class="ub h25 lh25 pl10 pr10" ng-if="$index==0">
+						<div class="ub">
+							<div class="ub-img ck checked" onclick="checkRadio(this)" code="{{shops.DRUG_SUPPLIER_CODE}}" amount="{{shops.DRUG_SUPPLIER_PRICE}}" yzf="{{shops.DRUG_SUPPLIER_DOWN}}"></div>
+						</div>
+						<div class="ub-f1 ml5">{{shops.DRUG_SUPPLIER_NAME}}</div>
+						<div class="ub tx-c">
+							<div class="c5">合计：</div>
+							<div>{{shops.DRUG_SUPPLIER_PRICE | currency:'&yen;'}}</div>
+						</div>
+					</div>
+					<div class="ub h25 lh25 pl10 pr10" ng-if="$index>0">
+						<div class="ub">
+							<div class="ub-img ck" onclick="checkRadio(this)" code="{{shops.DRUG_SUPPLIER_CODE}}" amount="{{shops.DRUG_SUPPLIER_PRICE}}" yzf="{{shops.DRUG_SUPPLIER_DOWN}}"></div>
+						</div>
+						<div class="ub-f1 ml5">{{shops.DRUG_SUPPLIER_NAME}}</div>
+						<div class="ub tx-c">
+							<div class="c5">合计：</div>
+							<div>{{shops.DRUG_SUPPLIER_PRICE | currency:'&yen;'}}</div>
+						</div>
+					</div>
+					<ul class="lh30 ubb" style="width: 100%;">
+						<li class="tx-c ubr" ng-repeat="drug in shops.GOODS" style="width:33%;float: left;">
+							{{drug.DRUG_PRICE | currency : '&yen;'}} * {{drug.CART_COUNT}}
+						</li>
+					</ul>
+					<div class="clear"></div>
+					<div class="ub ubt ubb h25 lh25 pl10 pr10" >
+						<div class="ub-f1"></div>
+						<div class="ub tx-r">
+							<div>预付定金：</div>
+							<div>{{shops.DRUG_SUPPLIER_DOWN | currency:'&yen;'}}</div>
+						</div>
+					</div>
+					
+				</div>
+			</div>
+		</div>
+		<div id="orderByLayer" class="fs9">
+			<!--<div class="oblItem" id="byCommit">评价</div>-->
+			<div class="oblItem" id="byPriceLtH" ng-click="order='PHACMAYS.allPrice'">价格从低到高</div>
+			<div class="oblItem" id="byPriceHtL" ng-click="order='-PHACMAYS.allPrice'">价格从高到低</div>
+			<div class="oblBg"></div>
+		</div>
+		<footer id="footer" class="footer">
+			<div id="toSearch">确认</div>
+		</footer>
+	</body>
+	<script type="text/javascript" src="../js/jquery.js"></script>
+	<script type="text/javascript" src="../js/common.js"></script>
+	<script type="text/javascript" src="../js/angular.min.js"></script>
+	<script type="text/javascript" src="../js/des.js"></script>
+
+</html>
+
+<script>
+	var type = request("type");
+	var hosId = request("hosId");
+	//获取搜索比价详情
+	getsearchParity();
+	var prescNo = request("prescNo");
+	var cardNO = localStorage.getItem("cardNo");
+	$(function() {
+		var fromUrl = requestFromUrl("fromUrl");
+		localStorage.setItem("fromUrl", fromUrl);
+		$("#back").click(function() {
+			localStorage.removeItem("fromUrl");
+			window.location.href = fromUrl;
+//			window.location.href = "emPrescription.html?type=" + type + "&hosId=" + hosId;
+		});
+		//单选框事件
+		$(".ck").click(function() {
+			var _s = $(this);
+			$(".ck").removeClass("checked");
+			_s.toggleClass("checked");
+		});
+		$("#toSearch").click(function() {
+			var code = $(".ck.checked").attr("code");
+			var amount=$(".ck.checked").attr("amount");
+			var yzf=$(".ck.checked").attr("yzf");
+			window.location.href = "drugSelect.html?code=" + code +"&amount="+amount+ "&prescNo=" + prescNo + "&type=" + request("type") + "&hosId=" + request("hosId")+"&yzf="+yzf;
+		});
+		//综合排序
+		$("#orderBy").click(function() {
+			$("#orderByDistance,#orderByDistance .ub-img").removeClass("active");
+			$("#orderBy, #orderBy .ub-img").addClass("active");
+			var display = $("#orderByLayer").css("display");
+			if (display == "none") {
+				showFilterBar();
+			} else {
+				hideFilterBar();
+			}
+		});
+		//综合排序筛选条件
+		$("#byCommit").click(function() {
+			$(".orderByTitle").text($(this).text());
+			hideFilterBar();
+		});
+		$("#byPriceHtL").click(function() {
+			$(".orderByTitle").text($(this).text());
+			hideFilterBar();
+		});
+		$("#byPriceLtH").click(function() {
+			$(".orderByTitle").text($(this).text());
+			hideFilterBar();
+		});
+		//距离优先
+		$("#orderByDistance").click(function() {
+			$("#orderBy, #orderBy .ub-img").removeClass("active");
+			$("#orderByDistance,#orderByDistance .ub-img").addClass("active");
+			hideFilterBar();
+			//刷新当前位置
+			//$("#geo button i.-location").click();
+		});
+		curlocation(); //定位监听
+	});
+	//获取搜索比价详情
+	function getsearchParity() {
+		loading();
+		var prescNo = request("prescNo");
+		var param = '{"interfaceType":"A0002", "data":{"PRESC_ID":"' + prescNo + '"}}';
+		param = strEnc(param, '111111', '', '');
+		var app = angular.module('myApp', []);
+		app.controller('getMsg', function($http, $scope) {
+			$http({
+				method: 'GET',
+				url: baseUrl,
+				params: {
+					'param': param
+				}
+			})
+			.success(function(data) {
+				if (data.success == 1) {
+					if (data.data) {
+						$scope.presc = data.PRESCS; //处方信息
+						$scope.list = data.data; //药店列表
+						//确认收货
+						$scope.confirm = function() {
+							confirm("您确认收到药物了吗？", receiptConfirm);
+						};
+					} else {
+						alert(data.PROCESS_RESULT);
+					}
+				} else {
+					alert(data.PROCESS_RESULT);
+				}
+				loaded();
+			})
+			.error(function() {
+				loaded();
+				alert("网络连接错误！");
+			});
+		});
+	}
+	//综合排序筛选条件 hide/show
+	function hideFilterBar() {
+		$("#content").css("position", "absolute");
+		$("body").css({
+			"overflow": "visible"
+		});
+		$("#orderByLayer").slideUp();
+	}
+	function showFilterBar() {
+//		var h = $("#content").height() - 69 + "px";
+//		$(".oblBg").height(h);
+		$("#content").css("position", "fixed");
+		$("body").css({
+			"overflow": "hidden"
+		});
+		$("#orderByLayer").slideDown();
+	}
+	//单选框事件
+	function checkRadio(dom) {
+		$(".ck").removeClass("checked");
+		$(dom).addClass("checked");
+	}
+	//定位监听
+	function curlocation() {
+		$("#curLocation").text("定位中...");
+		// 先获取元素
+		var lbsGeo = document.getElementById('geo');
+		//监听定位失败事件 geofail	
+		lbsGeo.addEventListener("geofail", function(evt) {
+			$("#curLocation").text("定位失败");
+		});
+		//监听定位成功事件 geosuccess
+		lbsGeo.addEventListener("geosuccess", function(evt) {
+			console.log(JSON.stringify(evt.detail));
+			var address = evt.detail.address;
+			$("#curLocation").text("定位成功");
+		});
+	}
+</script>

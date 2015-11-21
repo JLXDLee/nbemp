@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+
+	<head>
+		<title>定位</title>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no">
+		<meta http-equiv="pragma" content="no-cache">
+		<meta http-equiv="cache-control" content="no-cache">
+		<meta http-equiv="expires" content="0">
+		<link rel="stylesheet" href="../css/ui-box.css">
+		<link rel="stylesheet" href="../css/ui-base.css">
+		<link rel="stylesheet" href="../css/ui-color.css">
+		<link rel="stylesheet" href="../css/win.css">
+		<link rel="stylesheet" href="../css/ui-img.css" />
+		<script type="text/javascript" src="../js/jquery.js"></script>
+		<script type="text/javascript" src="../js/common.js"></script>
+		<script src="http://api.map.baidu.com/components?ak=dAnQhwTbAmdFn9Ry6LNmKWYB&v=1.0"></script>
+		<style>
+			html, body{
+				width: 100%;
+				height: 100%;
+				overflow: hidden;
+			}
+			#content{
+				margin-top: 0px;
+			}
+			lbs-geo{
+				margin-top: 48px;
+			}
+			[is=lbs-map]{
+				height: 100%;
+			}
+			/*百度地图兼容性CSS*/
+			#content{width: 100%;position:absolute;top:80px;margin-top:0;margin-bottom: 50px;}
+			.locbar.row.-ft-tertiary{
+				background-color: #FFFFFF;
+			}
+			.lbs-tag .page-nav .title.-ft-large{
+				width: 99%;
+			}
+			/*隐藏左下角LOGO*/
+			.lbs-logo {
+			    width: 0;
+			    height: 0;
+			}
+		</style>
+	</head>
+	
+	<body class="um-vp c-wh">
+		<!-- 页头 -->
+		<header id="header" class="header">
+			<div class="title">
+				<div class="title-left"></div>
+				<div class="title-mid">宁波外配处方平台</div>
+				<div class="title-right"></div>
+			</div>
+		</header>
+		<!--内容 -->
+		<lbs-geo id="geo" city="宁波市" enable-modified="true" show-ui="true"></lbs-geo>
+		<div id="content" class="bc2">
+			<!-- 地图组件 -->
+			<lbs-map center="116.403619,39.919851" zoom="12">
+				<lbs-poi name="百度大厦" location="116.307852,40.057031"></lbs-poi>
+				<lbs-poi name="奎科科技大厦" location="116.313393,40.04778" addr="北京市海淀区信息路甲9号"></lbs-poi>
+				<!--<lbs-poi name="奎科科技大厦" location="116.313393,40.04778" addr="北京市海淀区信息路甲9号"  icon-src="http://api0.map.bdimg.com/images/marker_red_sprite.png" height="25px" width="39px"></lbs-poi>-->
+			</lbs-map>
+		</div>
+		<script>
+			$(function(){
+				var h1 = $(window).height() - 80 + "px";
+				$("#content").height(h1);
+				curlocation();//定位监听
+			});
+			//定位监听
+			function curlocation(){
+				// 先获取元素
+				var lbsGeo = document.getElementById('geo');
+				//监听定位失败事件 geofail	
+				lbsGeo.addEventListener("geofail",function(evt){ 
+					alert("定位失败");
+				});
+				//监听定位成功事件 geosuccess
+				lbsGeo.addEventListener("geosuccess",function(evt){ 
+					console.log(JSON.stringify(evt.detail));
+					var address = evt.detail.address;
+					var coords = evt.detail.coords;
+//					var city = evt.detail.addressComponent.city;
+//					var city1 = $("#geo").attr("city");
+//					if(city != city1){
+//						alert("暂不支持" + city + ", 只支持" + city1);
+//					}
+					var x = coords.lng; 
+					var y = coords.lat;
+//					var mapHtml = '<lbs-map center="' + x + ',' + y + '" zoom="16"/>';
+//					$("#content").html(mapHtml);
+				});
+			}
+		</script>
+	</body>
+</html>

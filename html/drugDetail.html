@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html ng-app="myApp">
+
+	<head>
+		<title>药品明细查询</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no">
+		<meta http-equiv="pragma" content="no-cache">
+		<meta http-equiv="cache-control" content="no-cache">
+		<meta http-equiv="expires" content="0">
+		<link rel="stylesheet" href="../css/ui-box.css">
+		<link rel="stylesheet" href="../css/ui-base.css">
+		<link rel="stylesheet" href="../css/ui-color.css">
+		<link rel="stylesheet" href="../css/win.css">
+		<link rel="stylesheet" href="../css/ui-img.css" />
+		<style>
+		</style>
+	</head>
+
+	<body class="um-vp c-wh">
+		<!-- 页头 -->
+		<header id="header" class="header">
+			<div class="title">
+				<div class="title-left" goback id="back"></div>
+				<div class="title-mid">药品明细查询</div>
+				<div class="title-right">
+				</div>
+			</div>
+		</header>
+		<!--内容 -->
+		<div id="content" ng-controller="getMsg">
+			<div class=" bc2 pl10 pt10 pr10 fs6 pb10 ubb">
+				<table style="border:1px solid #e5e5e5; border-collapse:collapse; width: 100%;line-height: 30px;">
+					<thead>
+						<tr>
+							<td style="width: 10%; text-align: center;">序号</td>
+							<td style="width: 25%;text-align: center;">药品名</td>
+							<td style="width: 30%; text-align: center;">厂家</td>
+							<td style="width: 15%;text-align: center;">规格</td>
+							<td style="width: 10%;text-align: center;">数量</td>
+							<td style="width: 10%;text-align: center;">单位</td>
+						</tr>
+					</thead>
+					<tbody>
+						<tr  ng-repeat="drugs in presc">
+							<td style="width: 10%; text-align: center;">{{$index+1}}</td>
+							<td style="width: 25%;text-align: center;">{{drugs.gname}}</td>
+							<td style="width: 30%; text-align: center;">{{drugs.producer}}</td>
+							<td style="width: 15%;text-align: center;">{{drugs.spec}}</td>
+							<td style="width: 10%;text-align: center;">{{drugs.quantity}}</td>
+							<td style="width: 10%;text-align: center;">{{drugs.msunitno}}</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</body>
+
+</html>
+<script type="text/javascript" src="../js/jquery.js"></script>
+<script type="text/javascript" src="../js/common.js" ></script>
+<script type="text/javascript" src="../js/angular.min.js" ></script>
+<script type="text/javascript" src="../js/des.js" ></script>
+<script>
+    //
+    var prescNo=request("prescNo");//处方号
+    var code=request("code");
+    var type=request("type");
+	var hosId=request("hosId");
+    //获取药品详细
+    getdrugDetail(prescNo,code);
+	$(function() {
+		$("#back").click(function(){
+			window.location.href="drugSelect.html?prescNo="+prescNo+"&code="+code+"&type="+type+"&hosId="+hosId;
+		})
+	});
+	//获取药品明细
+	function getdrugDetail(prescNo, code) {
+			loading();
+			var param = '{"interfaceType":"A0008", "data":{"PRESC_ID":"' + prescNo + '","phCode":"' + code + '"}}';
+			param = strEnc(param, '111111', '', '');
+			var app = angular.module('myApp', []);
+			app.controller('getMsg', function($http, $scope) {
+				$http({
+						method: 'GET',
+						url: baseUrl,
+						params: {
+							'param': param
+						}
+					})
+					.success(function(data) {
+						if(data.PROCESS_DESC == "T") {
+							if (data.DATA) {
+								$scope.presc = data.DATA; //处方信息
+							}
+						} else {
+							alert(data.PROCESS_RESULT);
+						}
+						loaded();
+					}).error(function() {
+						loaded();
+						alert("网络连接错误！");
+					});
+			});
+		}
+</script>
